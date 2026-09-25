@@ -292,6 +292,64 @@
       localStorage.setItem("bbe_refresh_token", result.refresh_token);
 
       message.textContent = "Signed in successfully.";
+      const profileResponse = await supabaseRequest(
+  "/rest/v1/profiles?select=parent_name,child_name,location,approved,role&id=eq." + result.user.id,
+  {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + result.access_token
+    }
+  }
+);
+
+const profile = profileResponse[0];
+
+if (!profile) {
+  message.textContent = "Your account profile could not be found.";
+  return;
+}
+
+if (!profile.approved) {
+  message.textContent = "Your account is still waiting for BBE approval.";
+  return;
+}
+
+loginView.classList.add("hidden");
+
+const dashboard = document.createElement("section");
+
+dashboard.innerHTML = `
+  <h2>Welcome to the BBE Parent Portal</h2>
+  <p class="small">Welcome, ${profile.parent_name}.</p>
+
+  <div class="portal-grid">
+    <button>Announcements</button>
+    <button>Practice Schedule</button>
+    <button>Competitions</button>
+    <button>Dues & Payments</button>
+    <button>Uniforms & Costumes</button>
+    <button>Forms & Documents</button>
+    <button>Music</button>
+    <button>Team Photos</button>
+    <button>Team Chat</button>
+    <button>Important Updates</button>
+  </div>
+
+  <p class="small">
+    Child: ${profile.child_name}<br>
+    Location: ${profile.location}
+  </p>
+
+  <button id="logoutButton" class="secondary">Log Out</button>
+`;
+
+document.querySelector(".card").appendChild(dashboard);
+
+document.getElementById("logoutButton").onclick = () => {
+  localStorage.removeItem("bbe_access_token");
+  localStorage.removeItem("bbe_refresh_token");
+  window.location.reload();
+};
 
       /*
         The private dashboard will be connected after
