@@ -358,11 +358,12 @@ dashboard.innerHTML = `
     </div>
 
     <div class="portal-section">
-      <h3>Your Account</h3>
+      <h3>Your Practice Location</h3>
       <p class="small">
-        Child: ${escapeHtml(profile.child_name)}<br>
-        Location: ${escapeHtml(profile.location)}
+        Location: ${escapeHtml(profile.location)}<br>
+        <span id="privateAddress">Loading private address...</span>
       </p>
+      <a id="privateMapLink" class="portal-link" target="_blank" rel="noopener" href="#" style="display:none;">Open in Maps →</a>
     </div>
 
     <div class="portal-section">
@@ -381,6 +382,27 @@ dashboard.innerHTML = `
 `;
 
 document.querySelector(".card").appendChild(dashboard);
+
+const privateLocations = {
+  "Social Circle": {
+    address: "550 Fairplay Dr NE, Social Circle, GA 30025",
+    map: "https://www.google.com/maps/search/?api=1&query=550+Fairplay+Dr+NE%2C+Social+Circle%2C+GA+30025"
+  },
+  "Greensboro": {
+    address: "124 S Main St, Greensboro, GA 30642",
+    map: "https://www.google.com/maps/search/?api=1&query=124+S+Main+St%2C+Greensboro%2C+GA+30642"
+  }
+};
+
+const privateLocation = privateLocations[profile.location];
+if (privateLocation) {
+  document.getElementById("privateAddress").textContent = privateLocation.address;
+  const mapLink = document.getElementById("privateMapLink");
+  mapLink.href = privateLocation.map;
+  mapLink.style.display = "inline-block";
+} else {
+  document.getElementById("privateAddress").textContent = "Location details coming soon.";
+}
 
 async function loadTeamData() {
   try {
