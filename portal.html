@@ -108,6 +108,18 @@
       text-decoration: none;
     }
 
+
+    .portal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+    .portal-section{background:#181818;border:1px solid #292929;border-radius:14px;padding:16px}
+    .portal-section h3{margin:0 0 10px;font-size:.95rem;color:#489FB1}
+    .portal-list{display:grid;gap:9px}
+    .portal-item{border-top:1px solid #292929;padding-top:9px}
+    .portal-item:first-child{border-top:0;padding-top:0}
+    .portal-item strong{display:block}
+    .portal-item span{display:block;color:#489FB1;font-size:.78rem;margin-top:2px}
+    .portal-item p{margin:4px 0 0;color:#aaa;font-size:.85rem;line-height:1.45}
+    @media(max-width:520px){.portal-grid{grid-template-columns:1fr}}
+
     .small {
       font-size: .85rem;
       color: #aaa;
@@ -317,33 +329,89 @@ if (!profile.approved) {
 loginView.classList.add("hidden");
 
 const dashboard = document.createElement("section");
-
+dashboard.id = "dashboard";
 dashboard.innerHTML = `
   <h2>Welcome to the BBE Parent Portal</h2>
-  <p class="small">Welcome, ${profile.parent_name}.</p>
+  <p class="small">Welcome, ${escapeHtml(profile.parent_name)}.</p>
 
   <div class="portal-grid">
-    <button>Announcements</button>
-    <button>Practice Schedule</button>
-    <button>Competitions</button>
-    <button>Dues & Payments</button>
-    <button>Uniforms & Costumes</button>
-    <button>Forms & Documents</button>
-    <button>Music</button>
-    <button>Team Photos</button>
-    <button>Team Chat</button>
-    <button>Important Updates</button>
-  </div>
+    <div class="portal-section">
+      <h3>Announcements</h3>
+      <div id="announcementsList" class="portal-list"><p class="small">Loading...</p></div>
+    </div>
 
-  <p class="small">
-    Child: ${profile.child_name}<br>
-    Location: ${profile.location}
-  </p>
+    <div class="portal-section">
+      <h3>Practice Schedule</h3>
+      <div id="practiceList" class="portal-list"><p class="small">Loading...</p></div>
+    </div>
+
+    <div class="portal-section">
+      <h3>Competitions</h3>
+      <div id="competitionsList" class="portal-list"><p class="small">Loading...</p></div>
+    </div>
+
+    <div class="portal-section">
+      <h3>Important Updates</h3>
+      <div id="updatesList" class="portal-list"><p class="small">Loading...</p></div>
+    </div>
+
+    <div class="portal-section">
+      <h3>Your Account</h3>
+      <p class="small">
+        Child: ${escapeHtml(profile.child_name)}<br>
+        Location: ${escapeHtml(profile.location)}
+      </p>
+    </div>
+
+    <div class="portal-section">
+      <h3>Coming Soon</h3>
+      <p class="small">Dues & Payments, Uniforms & Costumes, Forms & Documents, Music, Team Photos, and Team Chat will be added here.</p>
+    </div>
+  </div>
 
   <button id="logoutButton" class="secondary">Log Out</button>
 `;
 
 document.querySelector(".card").appendChild(dashboard);
+
+async function loadTeamData() {
+  try {
+    const response = await fetch("site-data.json?ts=" + Date.now());
+    if (!response.ok) throw new Error("Could not load team information.");
+    const data = await response.json();
+
+    renderList("announcementsList", data.announcements, item => `
+      <div class="portal-item"><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.date || "")}</span><p>${escapeHtml(item.details || "")}</p></div>`);
+    renderList("practiceList", data.practice_schedule, item => `
+      <div class="portal-item"><strong>${escapeHtml(item.title || item.name || "Practice")}</strong><span>${escapeHtml(item.date || item.day || "")} ${escapeHtml(item.time || "")}</span><p>${escapeHtml(item.details || item.location || "")}</p></div>`);
+    renderList("competitionsList", data.competitions, item => `
+      <div class="portal-item"><strong>${escapeHtml(item.title || item.name || "Competition")}</strong><span>${escapeHtml(item.date || "")}</span><p>${escapeHtml(item.details || item.location || "")}</p></div>`);
+    renderList("updatesList", data.updates, item => `
+      <div class="portal-item"><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.details || "")}</p></div>`);
+  } catch (error) {
+    document.getElementById("announcementsList").innerHTML = "<p class='small'>Team information is temporarily unavailable.</p>";
+    document.getElementById("practiceList").innerHTML = "<p class='small'>Team information is temporarily unavailable.</p>";
+    document.getElementById("competitionsList").innerHTML = "<p class='small'>Team information is temporarily unavailable.</p>";
+    document.getElementById("updatesList").innerHTML = "<p class='small'>Team information is temporarily unavailable.</p>";
+  }
+}
+
+function renderList(id, items, template) {
+  const el = document.getElementById(id);
+  if (!items || !items.length) {
+    el.innerHTML = "<p class='small'>Nothing posted yet.</p>";
+    return;
+  }
+  el.innerHTML = items.map(template).join("");
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[char]));
+}
+
+loadTeamData();
 
 document.getElementById("logoutButton").onclick = () => {
   localStorage.removeItem("bbe_access_token");
@@ -351,10 +419,9 @@ document.getElementById("logoutButton").onclick = () => {
   window.location.reload();
 };
 
-      /*
-        The private dashboard will be connected after
-        Supabase database approval is configured.
-      */
+      // The dashboard is only rendered after a successful Supabase
+      // login and approved profile check. Team content is loaded here
+      // so the portal is no longer just placeholder buttons.
 
     } catch (error) {
       message.textContent = error.message;
