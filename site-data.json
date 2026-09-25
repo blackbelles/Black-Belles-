@@ -2,5 +2,10 @@
   "announcements": [],
   "practice_schedule": [],
   "competitions": [],
-  "updates": []
+  "updates": [
+    {
+      "title": "New Website!!! (Testing)",
+      "details": "Testing…"
+    }
+  ]
 }
