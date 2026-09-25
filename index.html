@@ -14,4 +14,47 @@
 <section class="section" id="documents"><div class="container"><div class="section-head"><div><div class="kicker">06 · Forms & Documents</div><h2>Know the<br>standard.</h2></div><p class="section-intro">Everything families need to know before joining and throughout the BBE season — presented directly on the site, with no separate paperwork to open.</p></div><div class="documents-grid"><article class="document-card document-wide"><span class="doc-tag">Team Registration</span><h3>Registration</h3><p>Registration is completed privately through the BBE Parent Portal. Approved parents can submit dancer information, sizing, health information and required acknowledgments there.</p><div class="doc-note"><strong>Parent Portal</strong><p style="margin-top:7px">Sign in to complete the 2026 registration form and securely submit the required information to BBE.</p><a class="social-btn" href="portal.html" style="display:inline-block;margin-top:14px">Open Parent Portal →</a></div></article><article class="document-card"><span class="doc-tag">Our Purpose</span><h3>Mission & Vision</h3><h4>Mission</h4><p>BBE seeks to foster self-esteem, self-confidence, determination and persistence in young women while encouraging academic excellence, community engagement and health through dance.</p><h4>Vision</h4><p>BBE is a diverse dance program including Hip Hop, Jazz, African, Majorette and Modern, with various instructors, gymnastics and technique training, state and national competitions, and community events such as parades and festivals.</p><div class="slogan-card">“Heavy is the Head that Wears the Crown”</div></article><article class="document-card document-wide"><span class="doc-tag">Student + Parent Requirements</span><h3>The BBE Standard</h3><div class="requirements"><div><b>01</b><p>Maintain at least a 3.0 average and good conduct.</p></div><div><b>02</b><p>No profanity, fighting or disruptive behavior. Noncompliance may lead to suspension or dismissal.</p></div><div><b>03</b><p>Parents communicate schedule conflicts. Practice schedules are posted in the Facebook group monthly. Too many missed practices or performances can lead to suspension or dismissal.</p></div><div><b>04</b><p>No parents in practices. Students must be dropped off and picked up on time.</p></div><div><b>05</b><p>Students and parents are required to participate in fundraisers, recitals, competitions, community functions, practices and other team activities.</p></div><div><b>06</b><p>Uniform requirements and purchases are announced in the Facebook group. Dance shoes, knee pads and other required items must be obtained.</p></div><div><b>07</b><p>Monthly tuition is $65, due by the 15th. Each late week adds $5. After two missed payments without arrangements, the child cannot compete. Communicate if financial issues arise.</p></div><div><b>08</b><p>A parent, family member or friend age 18+ must accompany the child to performances and competitions.</p></div><div><b>09</b><p>A scholarship is for one year unless a longer period is approved.</p></div><div><b>10</b><p>Hard work and fun go together; the team should not feel like a job.</p></div></div></article><article class="document-card"><span class="doc-tag">Tuition + Fees</span><h3>$65 / Month</h3><p>Monthly tuition is due by the 15th.</p><div class="fee-points"><div><strong>+$5</strong><span>For each late week</span></div><div><strong>2</strong><span>Missed payments without arrangements means the child cannot compete</span></div></div><p class="small-note">If financial issues arise, communicate with BBE rather than leaving the account unresolved.</p><div class="ack"><strong>Acknowledgment</strong><p>The registration form includes dancer and parent acknowledgment and signatures confirming the information and requirements.</p></div></article></div></div></section>
 <section class="section dark" id="resources"><div class="container"><div class="social"><div><div class="kicker">07 · Follow BBE</div><h2>See the<br>BBE energy.</h2><p>Follow the official BBE TikTok for team moments, performances and updates.</p></div><a class="social-btn" target="_blank" href="https://www.tiktok.com/@Blackbelles24">TikTok · @Blackbelles24 →</a></div></div></section></main>
 <footer class="footer"><div class="container footer-inner"><p><strong>BLACK BELLES OF ESSENCE</strong> · EST. 2024</p><div class="footer-links"><a href="#about">About</a><a href="#portal">Parent Portal</a><a href="#locations">Locations</a><a href="#coaches">Contact</a></div></div></footer>
-<script>const BBE_SUPABASE_URL="https://xpwvjynoaoqriygbijlb.supabase.co";const BBE_SUPABASE_KEY="sb_publishable_5sYm56f6kqiOGl_mM_Vulw_FXnifWTo";async function bbeCheckSession(){const accessToken=localStorage.getItem("bbe_access_token"),refreshToken=localStorage.getItem("bbe_refresh_token");let token=accessToken;if(!token&&!refreshToken)return false;try{let user=null;if(token){const r=await fetch(BBE_SUPABASE_URL+"/auth/v1/user",{headers:{apikey:BBE_SUPABASE_KEY,Authorization:"Bearer "+token}});if(r.ok)user=await r.json()}if(!user?.id&&refreshToken){const r=await fetch(BBE_SUPABASE_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:BBE_SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:refreshToken})});if(!r.ok)throw new Error();const refreshed=await r.json();localStorage.setItem("bbe_access_token",refreshed.access_token);localStorage.setItem("bbe_refresh_token",refreshed.refresh_token);user={id:refreshed.user?.id}}if(!user?.id)throw new Error();const activeToken=localStorage.getItem("bbe_access_token");const p=await fetch(BBE_SUPABASE_URL+"/rest/v1/profiles?select=approved&id=eq."+encodeURIComponent(user.id),{headers:{apikey:BBE_SUPABASE_KEY,Authorization:"Bearer "+activeToken}});if(!p.ok)throw new Error();const profiles=await p.json();return !!profiles[0]?.approved}catch(e){localStorage.removeItem("bbe_access_token");localStorage.removeItem("bbe_refresh_token");return false}}(async()=>{const approved=await bbeCheckSession();if(approved){document.querySelectorAll(".private-section.locked").forEach(s=>s.classList.remove("locked"));document.getElementById("socialCirclePrivate").innerHTML="550 Fairplay Dr NE, Social Circle, GA 30025";document.getElementById("greensboroPrivate").innerHTML="124 S Main St, Greensboro, GA 30642";document.getElementById("mikaPrivate").innerHTML='<a href="tel:+14784146935">478-414-6935</a>';document.getElementById("mayaPrivate").innerHTML='<a href="tel:+17064738314">706-473-8314</a>')}})();</script></body></html>
+<script>const BBE_SUPABASE_URL="https://xpwvjynoaoqriygbijlb.supabase.co";
+const BBE_SUPABASE_KEY="sb_publishable_5sYm56f6kqiOGl_mM_Vulw_FXnifWTo";
+
+async function bbeCheckSession(){
+ const accessToken=localStorage.getItem("bbe_access_token");
+ const refreshToken=localStorage.getItem("bbe_refresh_token");
+ if(!accessToken&&!refreshToken)return false;
+ try{
+  let token=accessToken,user=null;
+  if(token){
+   const r=await fetch(BBE_SUPABASE_URL+"/auth/v1/user",{headers:{apikey:BBE_SUPABASE_KEY,Authorization:"Bearer "+token}});
+   if(r.ok)user=await r.json();
+  }
+  if(!user?.id&&refreshToken){
+   const r=await fetch(BBE_SUPABASE_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:BBE_SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({refresh_token:refreshToken})});
+   if(!r.ok)throw new Error();
+   const x=await r.json();
+   localStorage.setItem("bbe_access_token",x.access_token);
+   localStorage.setItem("bbe_refresh_token",x.refresh_token);
+   token=x.access_token;user=x.user;
+  }
+  if(!user?.id)throw new Error();
+  const p=await fetch(BBE_SUPABASE_URL+"/rest/v1/profiles?select=approved&id=eq."+encodeURIComponent(user.id),{headers:{apikey:BBE_SUPABASE_KEY,Authorization:"Bearer "+token}});
+  if(!p.ok)throw new Error();
+  const rows=await p.json();
+  return rows[0]?.approved===true;
+ }catch(e){
+  return false;
+ }
+}
+async function bbeRefreshPrivateAccess(){
+ if(await bbeCheckSession()){
+  document.querySelectorAll(".private-section.locked").forEach(s=>s.classList.remove("locked"));
+  const s=document.getElementById("socialCirclePrivate"),g=document.getElementById("greensboroPrivate"),m=document.getElementById("mikaPrivate"),y=document.getElementById("mayaPrivate");
+  if(s)s.textContent="550 Fairplay Dr NE, Social Circle, GA 30025";
+  if(g)g.textContent="124 S Main St, Greensboro, GA 30642";
+  if(m)m.innerHTML='<a href="tel:+14784146935">478-414-6935</a>';
+  if(y)y.innerHTML='<a href="tel:+17064738314">706-473-8314</a>';
+ }
+}
+bbeRefreshPrivateAccess();
+window.addEventListener("pageshow",bbeRefreshPrivateAccess);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")bbeRefreshPrivateAccess();});
+</script></body></html>
