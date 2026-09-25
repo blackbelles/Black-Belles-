@@ -1,5 +1,11 @@
 {
-  "announcements": [],
+  "announcements": [
+    {
+      "title": "New Website!!",
+      "date": "TBA",
+      "details": "Testing ts.."
+    }
+  ],
   "practice_schedule": [],
   "competitions": [],
   "updates": [
