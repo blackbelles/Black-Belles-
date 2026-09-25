@@ -329,9 +329,7 @@ async function supabaseRequest(path, options = {}) {
 }
 
 
-async function restoreAdminSession(){const refreshToken=localStorage.getItem("bbe_admin_refresh_token"),accessToken=localStorage.getItem("bbe_admin_access_token");if(!refreshToken&&!accessToken)return;try{let token=accessToken,user=null;if(token){try{user=await supabaseRequest("/auth/v1/user",{headers:{"Authorization":"Bearer "+token}})}catch(e){}}if(!user?.id&&refreshToken){const refreshed=await supabaseRequest("/auth/v1/token?grant_type=refresh_token",{method:"POST",body:JSON.stringify({refresh_token:refreshToken})});token=refreshed.access_token;localStorage.setItem("bbe_admin_access_token",refreshed.access_token);localStorage.setItem("bbe_admin_refresh_token",refreshed.refresh_token);user=await supabaseRequest("/auth/v1/user",{headers:{"Authorization":"Bearer "+token}})}if(!user?.id)throw new Error();const profileResponse=await supabaseRequest("/rest/v1/profiles?select=id,parent_name,child_name,location,approved,role&id=eq."+user.id,{headers:{"Authorization":"Bearer "+token}});const profile=profileResponse[0];if(!profile||!profile.approved||profile.role!=="admin")throw new Error();loginView.classList.add("hidden");dashboardView.classList.remove("hidden");document.getElementById("welcomeMessage").textContent="Welcome, "+profile.parent_name+".";await loadAccounts();await loadRegistrations()}catch(e){localStorage.removeItem("bbe_admin_access_token");localStorage.removeItem("bbe_admin_refresh_token")}}
-
-document
+async function restoreAdminSession(){const refreshToken=localStorage.getItem("bbe_admin_refresh_token"),accessToken=localStorage.getItem("bbe_admin_access_token");if(!refreshToken&&!accessToken)return;try{let token=accessToken,user=null;if(token){try{user=await supabaseRequest("/auth/v1/user",{headers:{"Authorization":"Bearer "+token}})}catch(e){}}if(!user?.id&&refreshToken){const x=await supabaseRequest("/auth/v1/token?grant_type=refresh_token",{method:"POST",body:JSON.stringify({refresh_token:refreshToken})});token=x.access_token;localStorage.setItem("bbe_admin_access_token",x.access_token);localStorage.setItem("bbe_admin_refresh_token",x.refresh_token);user=await supabaseRequest("/auth/v1/user",{headers:{"Authorization":"Bearer "+token}})}if(!user?.id)throw new Error("No active admin session.");const p=await supabaseRequest("/rest/v1/profiles?select=id,parent_name,child_name,location,approved,role&id=eq."+encodeURIComponent(user.id),{headers:{"Authorization":"Bearer "+token}});const profile=p[0];if(!profile)throw new Error("Your BBE profile could not be found.");if(!profile.approved)throw new Error("Your account has not been approved.");if(profile.role!=="admin")throw new Error("This account does not have administrator access.");loginView.classList.add("hidden");dashboardView.classList.remove("hidden");document.getElementById("welcomeMessage").textContent="Welcome, "+profile.parent_name+".";await loadAccounts();await loadRegistrations();}catch(e){localStorage.removeItem("bbe_admin_access_token");localStorage.removeItem("bbe_admin_refresh_token");}}document
 .getElementById("loginForm")
 .addEventListener("submit", async (event) => {
 
@@ -582,72 +580,4 @@ async function loadAccounts() {
 }
 
 
-async function loadRegistrations(){const token=localStorage.getItem("bbe_admin_access_token");if(!token)return;try{const registrations=await supabaseRequest("/rest/v1/registrations?select=*&order=created_at.desc",{headers:{"Authorization":"Bearer "+token}});const list=document.getElementById("registrationList");if(!registrations.length){list.innerHTML="<p class='small'>No registrations submitted yet.</p>";return}list.innerHTML="";registrations.forEach(r=>{const card=document.createElement("div");card.className="user-card";card.innerHTML=`<h3>${escapeHtml(r.child_name)}</h3><p><strong>Parent:</strong> ${escapeHtml(r.parent_name)}</p><p><strong>Gender:</strong> ${escapeHtml(r.gender)}</p><p><strong>Birth Date:</strong> ${escapeHtml(r.birth_date)}</p><p><strong>Address:</strong> ${escapeHtml(r.address)}</p><p><strong>Home Phone:</strong> ${escapeHtml(r.home_phone||"—")}</p><p><strong>Cell Phone:</strong> ${escapeHtml(r.cell_phone||"—")}</p><p><strong>Height:</strong> ${escapeHtml(r.height||"—")} &nbsp; <strong>Weight:</strong> ${escapeHtml(r.weight||"—")}</p><p><strong>Sports Bra:</strong> ${escapeHtml(r.sports_bra||"—")}</p><p><strong>Dance Shoes:</strong> ${escapeHtml(r.dance_shoes||"—")}</p><p><strong>Pants:</strong> ${escapeHtml(r.pants||"—")} &nbsp; <strong>Tights:</strong> ${escapeHtml(r.tights||"—")}</p><p><strong>T-shirt:</strong> ${escapeHtml(r.t_shirt||"—")}</p><p><strong>Uniform Top / Pant:</strong> ${escapeHtml(r.uniform_top_pant||"—")}</p><p><strong>Allergies / Health:</strong> ${escapeHtml(r.allergies_health||"None reported")}</p><p><strong>Acknowledgments:</strong> Insurance ✓ &nbsp; Age ✓ &nbsp; GPA/Conduct ✓</p>`;list.appendChild(card)})}catch(error){document.getElementById("registrationList").innerHTML=`<p class="small">${escapeHtml(error.message)}</p>`}}\n\nasync function updateProfile(id, changes) {
-
-  const token =
-    localStorage.getItem("bbe_admin_access_token");
-
-  try {
-
-    await supabaseRequest(
-      "/rest/v1/profiles?id=eq." + id,
-      {
-        method: "PATCH",
-
-        headers: {
-          "Authorization": "Bearer " + token,
-          "Prefer": "return=minimal"
-        },
-
-        body: JSON.stringify(changes)
-      }
-    );
-
-
-    await loadAccounts();
-    await loadRegistrations();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-
-function escapeHtml(value) {
-
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-
-}
-
-
-restoreAdminSession();
-
-document
-.getElementById("logoutButton")
-.addEventListener("click", () => {
-
-  localStorage.removeItem(
-    "bbe_admin_access_token"
-  );
-
-  localStorage.removeItem(
-    "bbe_admin_refresh_token"
-  );
-
-  window.location.reload();
-
-});
-
-
-</script>
-
-</body>
-</html>
+async function loadRegistrations(){const token=localStorage.getItem("bbe_admin_access_token");if(!token)return;try{const rows=await supabaseRequest("/rest/v1/registrations?select=*&order=created_at.desc",{headers:{"Authorization":"Bearer "+token}});const list=document.getElementById("registrationList");list.innerHTML="";if(!rows.length){list.textContent="No registrations submitted yet.";return;}rows.forEach(r=>{const card=document.createElement("div");card.className="user-card";const h=document.createElement("h3");h.textContent=r.child_name||"Registration";card.appendChild(h);Object.keys(r).forEach(k=>{if(k==="id"||k==="parent_id"||k==="created_at"||k==="child_name")return;const p=document.createElement("p");p.textContent=k.replaceAll("_"," ")+": "+(r[k]??"—");card.appendChild(p);});list.appendChild(card);});}catch(e){document.getElementById("registrationList").textContent=e.message;}}
