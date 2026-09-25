@@ -1,0 +1,68 @@
+backend:
+  name: turbo-github
+  turbo_site_id: 0b04b290-070f-470a-a213-0313226313ae
+  branch: main
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "site"
+    label: "BBE Website"
+    files:
+      - name: "content"
+        label: "Website Content"
+        file: "site-data.json"
+        fields:
+          - label: "Announcements"
+            name: "announcements"
+            widget: "list"
+            fields:
+              - label: "Title"
+                name: "title"
+                widget: "string"
+              - label: "Date"
+                name: "date"
+                widget: "string"
+              - label: "Details"
+                name: "details"
+                widget: "text"
+
+          - label: "Practice Schedule"
+            name: "practice_schedule"
+            widget: "list"
+            fields:
+              - label: "Day"
+                name: "day"
+                widget: "string"
+              - label: "Time"
+                name: "time"
+                widget: "string"
+              - label: "Location"
+                name: "location"
+                widget: "string"
+
+          - label: "Competitions"
+            name: "competitions"
+            widget: "list"
+            fields:
+              - label: "Event"
+                name: "event"
+                widget: "string"
+              - label: "Date"
+                name: "date"
+                widget: "string"
+              - label: "Location"
+                name: "location"
+                widget: "string"
+
+          - label: "Important Updates"
+            name: "updates"
+            widget: "list"
+            fields:
+              - label: "Title"
+                name: "title"
+                widget: "string"
+              - label: "Details"
+                name: "details"
+                widget: "text"
