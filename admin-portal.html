@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BBE Admin Portal</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #080808;
+      color: white;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      background: #111;
+      border: 1px solid #4F1D8B;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 58px;
+      letter-spacing: 8px;
+      color: #489FB1;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: #aaa;
+      letter-spacing: 2px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .small {
+      color: #aaa;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      font-weight: bold;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: 1px solid #444;
+      background: #181818;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #4F1D8B;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    .secondary {
+      background: #222;
+      border: 1px solid #489FB1;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #1b1b1b;
+      color: #ddd;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .dashboard-header button {
+      width: auto;
+      margin: 0;
+      padding: 10px 18px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .stat {
+      background: #181818;
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      color: #489FB1;
+      margin-top: 5px;
+    }
+
+    .user-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .user-card {
+      background: #181818;
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .user-card h3 {
+      margin: 0 0 8px;
+    }
+
+    .user-card p {
+      margin: 5px 0;
+      color: #bbb;
+    }
+
+    .user-card select {
+      margin-top: 12px;
+    }
+
+    .approve {
+      background: #489FB1;
+      color: #000;
+    }
+
+    @media (max-width: 650px) {
+      body {
+        padding: 12px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .dashboard-header button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="brand">
+    <h1>BBE</h1>
+    <p>ADMIN PORTAL</p>
+  </div>
+
+  <!-- LOGIN -->
+  <section id="loginView">
+
+    <h2>Administrator Sign In</h2>
+
+    <p class="small">
+      Sign in with an approved BBE administrator account.
+    </p>
+
+    <form id="loginForm">
+
+      <label>Email</label>
+      <input id="loginEmail" type="email" required>
+
+      <label>Password</label>
+      <input id="loginPassword" type="password" required>
+
+      <button type="submit">Sign In</button>
+
+    </form>
+
+    <div id="loginMessage" class="message hidden"></div>
+
+  </section>
+
+
+  <!-- DASHBOARD -->
+  <section id="dashboardView" class="hidden">
+
+    <div class="dashboard-header">
+
+      <div>
+        <h2>Admin Dashboard</h2>
+        <p class="small" id="welcomeMessage"></p>
+      </div>
+
+      <button class="secondary" id="logoutButton">
+        Log Out
+      </button>
+
+    </div>
+
+
+    <div class="stats">
+
+      <div class="stat">
+        Total Accounts
+        <strong id="totalCount">0</strong>
+      </div>
+
+      <div class="stat">
+        Pending
+        <strong id="pendingCount">0</strong>
+      </div>
+
+      <div class="stat">
+        Approved
+        <strong id="approvedCount">0</strong>
+      </div>
+
+    </div>
+
+
+    <h2>Parent Accounts</h2>
+
+    <div id="userList" class="user-list">
+      <p class="small">Loading accounts...</p>
+    </div>
+
+  </section>
+
+
+  <div class="links">
+    <a href="index.html" style="color:#489FB1;">
+      ← Back to BBE Website
+    </a>
+  </div>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL = "https://xpwvjynoaoqriygbijlb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_5sYm56f6kqiOGl_mM_Vulw_FXnifWTo";
+
+const loginView = document.getElementById("loginView");
+const dashboardView = document.getElementById("dashboardView");
+const loginMessage = document.getElementById("loginMessage");
+
+
+async function supabaseRequest(path, options = {}) {
+
+  const response = await fetch(SUPABASE_URL + path, {
+
+    ...options,
+
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+
+    throw new Error(
+      data.msg ||
+      data.message ||
+      data.error_description ||
+      "Something went wrong."
+    );
+
+  }
+
+  return data;
+}
+
+
+document
+.getElementById("loginForm")
+.addEventListener("submit", async (event) => {
+
+  event.preventDefault();
+
+  loginMessage.textContent = "Signing in...";
+  loginMessage.classList.remove("hidden");
+
+  try {
+
+    const result = await supabaseRequest(
+      "/auth/v1/token?grant_type=password",
+      {
+        method: "POST",
+
+        body: JSON.stringify({
+          email: document.getElementById("loginEmail").value,
+          password: document.getElementById("loginPassword").value
+        })
+      }
+    );
+
+
+    const profileResponse = await supabaseRequest(
+      "/rest/v1/profiles?select=id,parent_name,child_name,location,approved,role&id=eq." + result.user.id,
+      {
+        method: "GET",
+
+        headers: {
+          "Authorization": "Bearer " + result.access_token
+        }
+      }
+    );
+
+
+    const profile = profileResponse[0];
+
+
+    if (!profile) {
+      throw new Error("Your BBE profile could not be found.");
+    }
+
+
+    if (!profile.approved) {
+      throw new Error("Your account has not been approved.");
+    }
+
+
+    if (profile.role !== "admin") {
+      throw new Error("This account does not have administrator access.");
+    }
+
+
+    localStorage.setItem(
+      "bbe_admin_access_token",
+      result.access_token
+    );
+
+    localStorage.setItem(
+      "bbe_admin_refresh_token",
+      result.refresh_token
+    );
+
+
+    loginView.classList.add("hidden");
+    dashboardView.classList.remove("hidden");
+
+    document.getElementById("welcomeMessage").textContent =
+      "Welcome, " + profile.parent_name + ".";
+
+
+    await loadAccounts();
+
+  } catch (error) {
+
+    loginMessage.textContent = error.message;
+    loginMessage.classList.remove("hidden");
+
+  }
+
+});
+
+
+async function loadAccounts() {
+
+  const token =
+    localStorage.getItem("bbe_admin_access_token");
+
+  if (!token) return;
+
+
+  try {
+
+    const profiles = await supabaseRequest(
+      "/rest/v1/profiles?select=id,parent_name,child_name,location,approved,role,created_at&order=created_at.desc",
+      {
+        method: "GET",
+
+        headers: {
+          "Authorization": "Bearer " + token
+        }
+      }
+    );
+
+
+    const total = profiles.length;
+
+    const pending =
+      profiles.filter(profile => !profile.approved).length;
+
+    const approved =
+      profiles.filter(profile => profile.approved).length;
+
+
+    document.getElementById("totalCount").textContent = total;
+    document.getElementById("pendingCount").textContent = pending;
+    document.getElementById("approvedCount").textContent = approved;
+
+
+    const userList =
+      document.getElementById("userList");
+
+    userList.innerHTML = "";
+
+
+    if (profiles.length === 0) {
+
+      userList.innerHTML =
+        '<p class="small">No parent accounts found.</p>';
+
+      return;
+
+    }
+
+
+    profiles.forEach(profile => {
+
+      const card =
+        document.createElement("div");
+
+      card.className = "user-card";
+
+
+      card.innerHTML = `
+
+        <h3>${escapeHtml(profile.parent_name)}</h3>
+
+        <p>
+          <strong>Child:</strong>
+          ${escapeHtml(profile.child_name)}
+        </p>
+
+        <p>
+          <strong>Location:</strong>
+          ${escapeHtml(profile.location)}
+        </p>
+
+        <p>
+          <strong>Status:</strong>
+          ${profile.approved ? "Approved" : "Pending"}
+        </p>
+
+        <p>
+          <strong>Role:</strong>
+          ${escapeHtml(profile.role)}
+        </p>
+
+        <select
+          class="roleSelect"
+          data-id="${profile.id}"
+        >
+          <option value="parent"
+            ${profile.role === "parent" ? "selected" : ""}>
+            Parent
+          </option>
+
+          <option value="coach"
+            ${profile.role === "coach" ? "selected" : ""}>
+            Coach
+          </option>
+
+          <option value="admin"
+            ${profile.role === "admin" ? "selected" : ""}>
+            Admin
+          </option>
+        </select>
+
+        ${
+          !profile.approved
+          ?
+          `<button
+             class="approve"
+             data-id="${profile.id}">
+             Approve Account
+           </button>`
+          :
+          ""
+        }
+
+      `;
+
+
+      userList.appendChild(card);
+
+    });
+
+
+    document
+    .querySelectorAll(".approve")
+    .forEach(button => {
+
+      button.addEventListener("click", async () => {
+
+        await updateProfile(
+          button.dataset.id,
+          { approved: true }
+        );
+
+      });
+
+    });
+
+
+    document
+    .querySelectorAll(".roleSelect")
+    .forEach(select => {
+
+      select.addEventListener("change", async () => {
+
+        await updateProfile(
+          select.dataset.id,
+          { role: select.value }
+        );
+
+      });
+
+    });
+
+
+  } catch (error) {
+
+    document.getElementById("userList").innerHTML =
+      `<p class="small">${escapeHtml(error.message)}</p>`;
+
+  }
+
+}
+
+
+async function updateProfile(id, changes) {
+
+  const token =
+    localStorage.getItem("bbe_admin_access_token");
+
+  try {
+
+    await supabaseRequest(
+      "/rest/v1/profiles?id=eq." + id,
+      {
+        method: "PATCH",
+
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Prefer": "return=minimal"
+        },
+
+        body: JSON.stringify(changes)
+      }
+    );
+
+
+    await loadAccounts();
+
+  } catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+document
+.getElementById("logoutButton")
+.addEventListener("click", () => {
+
+  localStorage.removeItem(
+    "bbe_admin_access_token"
+  );
+
+  localStorage.removeItem(
+    "bbe_admin_refresh_token"
+  );
+
+  window.location.reload();
+
+});
+
+
+</script>
+
+</body>
+</html>
