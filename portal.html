@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BBE Parent Portal</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: #111;
+      border: 1px solid #4F1D8B;
+      border-radius: 22px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(79, 29, 139, .3);
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 3rem;
+      letter-spacing: .12em;
+      color: #fff;
+    }
+
+    .brand p {
+      color: #489FB1;
+      margin: 8px 0 0;
+      font-size: .85rem;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      font-size: .9rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      border-radius: 10px;
+      border: 1px solid #444;
+      background: #181818;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 18px;
+      background: #4F1D8B;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: transparent;
+      border: 1px solid #489FB1;
+      color: #489FB1;
+    }
+
+    .hidden { display: none; }
+
+    .message {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #181818;
+      line-height: 1.5;
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 22px;
+    }
+
+    .links a {
+      color: #489FB1;
+      text-decoration: none;
+    }
+
+    .small {
+      font-size: .85rem;
+      color: #aaa;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="brand">
+    <h1>BBE</h1>
+    <p>Parent Portal</p>
+  </div>
+
+  <!-- LOGIN -->
+  <section id="loginView">
+    <h2>Welcome back.</h2>
+    <p class="small">Sign in to access the private BBE Parent Portal.</p>
+
+    <form id="loginForm">
+      <label>Email</label>
+      <input id="loginEmail" type="email" required>
+
+      <label>Password</label>
+      <input id="loginPassword" type="password" required>
+
+      <button type="submit">Sign In</button>
+    </form>
+
+    <button class="secondary" id="showSignup">Create Parent Account</button>
+
+    <div id="loginMessage" class="message hidden"></div>
+  </section>
+
+  <!-- SIGN UP -->
+  <section id="signupView" class="hidden">
+    <h2>Create your account.</h2>
+    <p class="small">
+      Create your BBE parent account. Your account will need to be approved
+      before you can access private team information.
+    </p>
+
+    <form id="signupForm">
+
+      <label>Parent / Guardian Name</label>
+      <input id="parentName" type="text" required>
+
+      <label>Email</label>
+      <input id="signupEmail" type="email" required>
+
+      <label>Password</label>
+      <input id="signupPassword" type="password" minlength="8" required>
+
+      <label>Confirm Password</label>
+      <input id="confirmPassword" type="password" minlength="8" required>
+
+      <label>Child's Name</label>
+      <input id="childName" type="text" required>
+
+      <label>BBE Location</label>
+      <select id="location" required>
+        <option value="">Select a location</option>
+        <option value="Social Circle">Social Circle</option>
+        <option value="Greensboro">Greensboro</option>
+        <option value="Loganville">Loganville</option>
+      </select>
+
+      <button type="submit">Create Account</button>
+    </form>
+
+    <button class="secondary" id="showLogin">Back to Sign In</button>
+
+    <div id="signupMessage" class="message hidden"></div>
+  </section>
+
+  <div class="links">
+    <a href="index.html">← Back to BBE Website</a>
+  </div>
+
+</div>
+
+<script>
+  const SUPABASE_URL = "https://xpwvjynoaoqriygbijlb.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_5sYm56f6kqiOGl_mM_Vulw_FXnifWTo";
+
+  const loginView = document.getElementById("loginView");
+  const signupView = document.getElementById("signupView");
+
+  document.getElementById("showSignup").onclick = () => {
+    loginView.classList.add("hidden");
+    signupView.classList.remove("hidden");
+  };
+
+  document.getElementById("showLogin").onclick = () => {
+    signupView.classList.add("hidden");
+    loginView.classList.remove("hidden");
+  };
+
+  async function supabaseRequest(path, options = {}) {
+    const response = await fetch(SUPABASE_URL + path, {
+      ...options,
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.msg || data.message || data.error_description || "Something went wrong.");
+    }
+
+    return data;
+  }
+
+  document.getElementById("signupForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const password = document.getElementById("signupPassword").value;
+    const confirm = document.getElementById("confirmPassword").value;
+    const message = document.getElementById("signupMessage");
+
+    if (password !== confirm) {
+      message.textContent = "Your passwords do not match.";
+      message.classList.remove("hidden");
+      return;
+    }
+
+    message.textContent = "Creating your account...";
+    message.classList.remove("hidden");
+
+    try {
+      const result = await supabaseRequest("/auth/v1/signup", {
+        method: "POST",
+        body: JSON.stringify({
+          email: document.getElementById("signupEmail").value,
+          password: password,
+          data: {
+            parent_name: document.getElementById("parentName").value,
+            child_name: document.getElementById("childName").value,
+            location: document.getElementById("location").value
+          }
+        })
+      });
+
+      if (result.user) {
+        message.textContent =
+          "Your account was created and is waiting for BBE approval. Please wait for an administrator to approve your account.";
+      } else {
+        message.textContent = "Please check your email to confirm your account.";
+      }
+
+      event.target.reset();
+
+    } catch (error) {
+      message.textContent = error.message;
+    }
+  });
+
+  document.getElementById("loginForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const message = document.getElementById("loginMessage");
+    message.textContent = "Signing in...";
+    message.classList.remove("hidden");
+
+    try {
+      const result = await supabaseRequest("/auth/v1/token?grant_type=password", {
+        method: "POST",
+        body: JSON.stringify({
+          email: document.getElementById("loginEmail").value,
+          password: document.getElementById("loginPassword").value
+        })
+      });
+
+      localStorage.setItem("bbe_access_token", result.access_token);
+      localStorage.setItem("bbe_refresh_token", result.refresh_token);
+
+      message.textContent = "Signed in successfully.";
+
+      /*
+        The private dashboard will be connected after
+        Supabase database approval is configured.
+      */
+
+    } catch (error) {
+      message.textContent = error.message;
+    }
+  });
+</script>
+
+</body>
+</html>
