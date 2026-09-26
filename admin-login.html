@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBE Coach Login</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:#080808;color:#fff;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{width:100%;max-width:460px;background:#111;border:1px solid #4F1D8B;border-radius:22px;padding:32px;box-shadow:0 20px 60px rgba(79,29,139,.3)}
+.brand{text-align:center;margin-bottom:28px}.brand h1{margin:0;font-size:3.5rem;letter-spacing:.14em;color:#489FB1}.brand p{color:#aaa;margin:7px 0 0;letter-spacing:.18em;text-transform:uppercase;font-size:.8rem}
+h2{margin-top:0}label{display:block;margin:16px 0 7px;font-size:.9rem}input{width:100%;padding:13px;border-radius:10px;border:1px solid #444;background:#181818;color:#fff;font-size:1rem}
+button{width:100%;border:0;border-radius:10px;padding:14px;margin-top:20px;background:#4F1D8B;color:#fff;font-weight:bold;font-size:1rem;cursor:pointer}.message{margin-top:16px;padding:12px;border-radius:10px;background:#181818;line-height:1.5}.hidden{display:none}.small{font-size:.85rem;color:#aaa;line-height:1.5}.links{text-align:center;margin-top:22px}.links a{color:#489FB1;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="card">
+<div class="brand"><h1>BBE</h1><p>Coach Access</p></div>
+<section>
+<h2>Administrator Sign In</h2>
+<p class="small">This login is for authorized BBE coaches and administrators.</p>
+<form id="adminLoginForm">
+<label>Username</label>
+<input id="adminUsername" type="text" autocomplete="username" required>
+<label>Password</label>
+<input id="adminPassword" type="password" autocomplete="current-password" required>
+<button type="submit">Sign In</button>
+</form>
+<div id="message" class="message hidden"></div>
+</section>
+<div class="links"><a href="index.html">← Back to BBE Website</a></div>
+</div>
+<script>
+const SUPABASE_URL="https://xpwvjynoaoqriygbijlb.supabase.co";
+const SUPABASE_KEY="sb_publishable_5sYm56f6kqiOGl_mM_Vulw_FXnifWTo";
+const ADMIN_EMAIL="samayamathis94@gmail.com";
+async function request(path,options={}){
+ const response=await fetch(SUPABASE_URL+path,{...options,headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json",...(options.headers||{})}});
+ const data=await response.json().catch(()=>({}));
+ if(!response.ok)throw new Error(data.msg||data.message||data.error_description||"Unable to sign in.");
+ return data;
+}
+document.getElementById("adminLoginForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+ const message=document.getElementById("message");
+ message.classList.remove("hidden");
+ message.textContent="Signing in...";
+ const username=document.getElementById("adminUsername").value.trim();
+ const password=document.getElementById("adminPassword").value;
+ try{
+   if(username!=="BBECOACHES")throw new Error("Incorrect admin username or password.");
+   const result=await request("/auth/v1/token?grant_type=password",{method:"POST",body:JSON.stringify({email:ADMIN_EMAIL,password})});
+   const rows=await request("/rest/v1/profiles?select=id,parent_name,approved,role&id=eq."+encodeURIComponent(result.user.id),{headers:{"Authorization":"Bearer "+result.access_token}});
+   const profile=rows[0];
+   if(!profile||!profile.approved||profile.role!=="admin")throw new Error("This account does not have administrator access.");
+   localStorage.setItem("bbe_admin_access_token",result.access_token);
+   if(result.refresh_token)localStorage.setItem("bbe_admin_refresh_token",result.refresh_token);
+   window.location.href="admin-portal.html";
+ }catch(error){
+   localStorage.removeItem("bbe_admin_access_token");
+   localStorage.removeItem("bbe_admin_refresh_token");
+   message.textContent=error.message||"Unable to sign in.";
+ }
+});
+</script>
+</body>
+</html>
