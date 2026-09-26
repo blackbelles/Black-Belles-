@@ -216,7 +216,7 @@
       Sign in with an approved BBE administrator account.
     </p>
 
-    <form id="loginForm">
+    <form id="loginForm" onsubmit="adminLogin(event)">
 
       <label>Email</label>
       <input id="loginEmail" type="email" required>
@@ -297,6 +297,37 @@ const loginView = document.getElementById("loginView");
 const dashboardView = document.getElementById("dashboardView");
 const loginMessage = document.getElementById("loginMessage");
 
+
+async function adminLogin(event){
+  event.preventDefault();
+  const message=document.getElementById("loginMessage");
+  message.textContent="Signing in...";
+  message.classList.remove("hidden");
+  try{
+    const result=await supabaseRequest("/auth/v1/token?grant_type=password",{
+      method:"POST",
+      body:JSON.stringify({
+        email:document.getElementById("loginEmail").value.trim(),
+        password:document.getElementById("loginPassword").value
+      })
+    });
+    localStorage.setItem("bbe_admin_access_token",result.access_token);
+    if(result.refresh_token)localStorage.setItem("bbe_admin_refresh_token",result.refresh_token);
+    const rows=await supabaseRequest("/rest/v1/profiles?select=id,parent_name,approved,role&id=eq."+encodeURIComponent(result.user.id),{headers:{"Authorization":"Bearer "+result.access_token}});
+    const profile=rows[0];
+    if(!profile)throw new Error("Your BBE profile could not be found.");
+    if(!profile.approved)throw new Error("Your account has not been approved.");
+    if(profile.role!=="admin")throw new Error("This account does not have administrator access.");
+    document.getElementById("loginView").classList.add("hidden");
+    document.getElementById("dashboardView").classList.remove("hidden");
+    document.getElementById("welcomeMessage").textContent="Welcome, "+profile.parent_name+".";
+    await loadAccounts();
+    await loadRegistrations();
+  }catch(error){
+    message.textContent=error.message||"Unable to sign in.";
+    message.classList.remove("hidden");
+  }
+}
 
 async function supabaseRequest(path, options = {}) {
 
